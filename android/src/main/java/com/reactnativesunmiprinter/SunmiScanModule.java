@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import androidx.core.content.ContextCompat;
@@ -96,10 +97,15 @@ public class SunmiScanModule extends ReactContextBaseJavaModule {
   private void registerReceiver() {
     IntentFilter filter = new IntentFilter();
     filter.addAction(ACTION_DATA_CODE_RECEIVED);
-    ContextCompat.registerReceiver(reactContext, receiver, filter, Context.RECEIVER_EXPORTED);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      reactContext.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+    } else {
+      reactContext.registerReceiver(receiver, filter);
+    }
   }
 
   private static void sendEvent(String msg) {
     reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("onScanSuccess", msg);
   }
 }
+
