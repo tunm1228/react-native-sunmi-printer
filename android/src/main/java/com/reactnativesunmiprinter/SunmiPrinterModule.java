@@ -15,17 +15,11 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.sunmi.peripheral.printer.InnerPrinterCallback;
-import com.sunmi.peripheral.printer.InnerPrinterException;
 import com.sunmi.peripheral.printer.InnerPrinterManager;
 import com.sunmi.peripheral.printer.InnerResultCallback;
 import com.sunmi.peripheral.printer.SunmiPrinterService;
-import com.sunmi.peripheral.printer.TransBean;
-import com.sunmi.peripheral.printer.WoyouConsts;
-
-import java.util.Map;
 
 @ReactModule(name = SunmiPrinterModule.NAME)
 public class SunmiPrinterModule extends ReactContextBaseJavaModule {
@@ -379,39 +373,6 @@ public class SunmiPrinterModule extends ReactContextBaseJavaModule {
   }
 
   /**
-   * 打印图片
-   * 图⽚最⼤像素需要宽x⾼⼩于250万，且宽度根据纸张规格设置（58为384像素，80为576像素），
-   * 如果超过纸张宽度将不显示
-   * https://github.com/Surile/react-native-sunmi-printer/issues/1#issuecomment-1088685896
-   * 
-   * @param encodedString
-   * @param pixelWidth
-   */
-  @ReactMethod
-  public void printBitmap(String encodedString, int pixelWidth) throws RemoteException {
-    final String pureBase64Encoded = encodedString.substring(encodedString.indexOf(",") + 1);
-    final byte[] decodedBytes = Base64.decode(pureBase64Encoded, Base64.DEFAULT);
-    Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-    int w = decodedBitmap.getWidth();
-    Integer h = decodedBitmap.getHeight();
-    Bitmap scaledImage = Bitmap.createScaledBitmap(decodedBitmap, pixelWidth, (pixelWidth / w) * h, false);
-    printerService.printBitmap(scaledImage, innerResultCallback);
-  }
-
-  /**
-   * 打印图⽚(2)
-   * 图⽚像素分辨率⼩于200万，且宽度根据纸张规格设置（58为384像素，80为576像素），如果超
-   * 过纸张宽度将不显示
-   *
-   * @param bitmap
-   * @param type
-   */
-  @ReactMethod
-  public void printBitmapCustom(Bitmap bitmap, int type) throws RemoteException {
-    printerService.printBitmapCustom(bitmap, type, innerResultCallback);
-  }
-
-  /**
    * 打印图⽚(3)
    * 图⽚像素分辨率⼩于200万，且宽度根据纸张规格设置（58为384像素，80为576像素），如果超
    * 过纸张宽度将不显示
@@ -469,16 +430,6 @@ public class SunmiPrinterModule extends ReactContextBaseJavaModule {
   @ReactMethod
   public void print2DCode(String data, int symbology, int modulesize, int errorlevel) throws RemoteException {
     printerService.print2DCode(data, symbology, modulesize, errorlevel, innerResultCallback);
-  }
-
-  /**
-   * 包事务打印专用接口
-   *
-   * @param tranBean
-   */
-  @ReactMethod
-  public void commitPrint(TransBean[] tranBean) throws RemoteException {
-    printerService.commitPrint(tranBean, innerResultCallback);
   }
 
   /**
